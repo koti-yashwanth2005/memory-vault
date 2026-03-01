@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>One Last Click</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 20%, #f093fb 40%, #f5576c 60%, #4facfe 80%, #00f2fe 100%);
+    background-attachment: fixed;
+    color: #1a1a2e;
+    text-align: center;
+    min-height: 100vh;
+}
+
+/* HEADER */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 50px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(25px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.brand {
+    font-size: 30px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #4facfe, #43e97b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.contact {
+    font-size: 15px;
+    color: #333;
+    font-weight: 600;
+    padding: 12px 22px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 25px;
+    text-decoration: none;
+}
+
+/* MAIN */
+.main {
+    padding: 100px 40px 60px;
+}
+
+.photo-frame {
+    display: inline-block;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 35px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+}
+
+.photo-frame img {
+    width: 100%;
+    max-width: 1000px;
+    border-radius: 25px;
+}
+
+.batch-name {
+    margin-top: 45px;
+    font-size: 40px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #43e97b, #4facfe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.memories-btn {
+    margin-top: 60px;
+    padding: 22px 70px;
+    font-size: 20px;
+    font-weight: 700;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 20px 40px rgba(79, 172, 254, 0.4);
+    transition: 0.3s ease;
+}
+
+.memories-btn:hover {
+    transform: translateY(-5px);
+}
+
+/* FOOTER */
+footer {
+    margin-top: 100px;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.social-links a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .batch-name {
+        font-size: 30px;
+    }
+
+    .memories-btn {
+        width: 90%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="brand">One Last Click</div>
+    <a href="mailto:example@gmail.com" class="contact">✉️ Contact Us</a>
+</header>
+
+<div class="main">
+    <div class="photo-frame">
+        <img id="batchImage" src="" alt="Batch Image">
+    </div>
+
+    <div class="batch-name" id="batchName"></div>
+
+    <button class="memories-btn" onclick="openMemories()">
+        ✨ Explore Memories
+    </button>
+</div>
+
+<footer>
+    <div class="social-links">
+        <a href="#">Whatsapp</a>
+        <a href="#">Instagram</a>
+        <a href="#">X</a>
+        <a href="#">Facebook</a>
+        <a href="#">Website</a>
+    </div>
+</footer>
+
+<script>
+let currentBatch = null;
+
+async function loadBatch() {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+
+    if (!code) {
+        document.getElementById("batchName").innerText = "Batch Code Missing";
+        return;
+    }
+
+    try {
+        const response = await fetch("batches.json");
+        const batches = await response.json();
+
+        if (batches[code]) {
+            currentBatch = batches[code];
+            document.getElementById("batchName").innerText = currentBatch.name;
+            document.getElementById("batchImage").src = currentBatch.image;
+        } else {
+            document.getElementById("batchName").innerText = "Invalid Batch Code";
+        }
+
+    } catch (error) {
+        document.getElementById("batchName").innerText = "Error Loading Data";
+    }
+}
+
+function openMemories() {
+    if (!currentBatch) return;
+    window.open(currentBatch.drive, '_blank');
+}
+
+loadBatch();
+</script>
+
+</body>
+</html>
