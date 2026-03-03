@@ -93,31 +93,24 @@ header{
 
 /* UNIVERSAL IMAGE FRAME */
 .image-box{
-    width:95%;
-    max-width:900px;
-    margin: auto;
-    border-radius:10px;
-    overflow:hidden;
-    background: transparent
-  /* border-radius:18px;
+    width:90%;
+    max-width:400px;
+    aspect-ratio: 3 / 4;
+    background:#000000;
+    border-radius:18px;
     display:flex;
     align-items:center;
     justify-content:center;
     overflow:hidden;
-    -->*/
- 
-}
+    box-shadow:0 20px 50px rgba(5,0,0,0.5);
 }
 
 /* IMAGE AUTO FIT */
 .image-box img{
     width:100%;
-    height:auto;
- /*  <!-- object-fit:cover;
-    background:#2D6A4F; -->*/
-    display: block;
-    border-radius:8px;
-  /* <!-- border-radius:18px>*/
+    height:100%;
+    object-fit:contain;
+    background:#FAF9F6;
 }
 
 /* Batch Name */
@@ -218,7 +211,7 @@ if(batchCode){
     .then(response => response.json())
     .then(data => {
         if(data[batchCode]){
-            document.getElementById("batchImage").src = data[batchCode].image;
+            document.getElementById("batchImage").src = "images/" + data[batchCode].image;
             document.getElementById("batchName").innerText = data[batchCode].name;
             driveLink = data[batchCode].drive;
         } else {
@@ -238,18 +231,3 @@ function openMemories(){
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
