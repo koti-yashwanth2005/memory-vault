@@ -22,7 +22,43 @@ body{
     position:relative;
 }
 
+/* PASSWORD SCREEN */
+
+#passwordGate{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+}
+
+.password-box{
+    background:#fff;
+    color:#000;
+    padding:30px;
+    border-radius:10px;
+    text-align:center;
+}
+
+.password-box input{
+    padding:10px;
+    margin-top:10px;
+    width:200px;
+}
+
+.password-box button{
+    margin-top:10px;
+    padding:10px 20px;
+    cursor:pointer;
+}
+
 /* Academic Pattern Background */
+
 body::before{
     content:"";
     position:fixed;
@@ -34,6 +70,7 @@ body::before{
 }
 
 /* HEADER */
+
 header{
     display:flex;
     justify-content:space-between;
@@ -42,7 +79,6 @@ header{
     background:#2D6A4F;
 }
 
-/* Brand Section */
 .brand-wrapper{
     display:flex;
     align-items:center;
@@ -51,21 +87,18 @@ header{
     color:#F8F9FA;
 }
 
-/* Logo Image */
 .brand-logo{
     height:38px;
     width:auto;
     object-fit:contain;
 }
 
-/* Brand Name */
 .brand-name{
     font-size:20px;
     font-weight:600;
     letter-spacing:0.5px;
 }
 
-/* Contact Button */
 .contact{
     font-size:14px;
     color:#F8F9FA;
@@ -82,6 +115,7 @@ header{
 }
 
 /* MAIN */
+
 .main{
     flex:1;
     display:flex;
@@ -91,7 +125,6 @@ header{
     padding:50px 20px;
 }
 
-/* UNIVERSAL IMAGE FRAME */
 .image-box{
     width:95%;
     max-width:900px;
@@ -99,22 +132,18 @@ header{
     box-shadow:0 20px 50px rgba(5,0,0,0.5);
 }
 
-/* IMAGE AUTO FIT */
 .image-box img{
     width:100%;
     height:auto;
     object-fit:contain;
- 
 }
 
-/* Batch Name */
 .batch-name{
     margin-top:20px;
     font-size:18px;
     letter-spacing:1px;
 }
 
-/* BUTTON */
 .memories-btn{
     margin-top:30px;
     padding:12px 45px;
@@ -133,6 +162,7 @@ header{
 }
 
 /* FOOTER */
+
 footer{
     text-align:center;
     padding:18px;
@@ -151,85 +181,135 @@ footer{
     opacity:1;
 }
 
-/* MOBILE */
 @media(max-width:600px){
     .image-box{
         max-width:320px;
     }
 }
+
 </style>
 </head>
 
 <body>
 
-<header>
-    <!-- Brand clickable -->
-    <a href="#" class="brand-wrapper">
-        <img src="images/logo.png" class="brand-logo" alt="OLC">
-        <div class="brand-name">One Last Click</div>
-    </a>
+<!-- PASSWORD POPUP -->
 
-    <a href="mailto:example@gmail.com" class="contact">Contact Us</a>
+<div id="passwordGate">
+<div class="password-box">
+<h2>Enter Batch Password</h2>
+<input type="password" id="batchPassword" placeholder="Password">
+<br><br>
+<button onclick="unlock()">Enter</button>
+</div>
+</div>
+
+<header>
+
+<a href="#" class="brand-wrapper">
+<img src="images/logo.png" class="brand-logo" alt="OLC">
+<div class="brand-name">One Last Click</div>
+</a>
+
+<a href="mailto:example@gmail.com" class="contact">Contact Us</a>
+
 </header>
 
 <div class="main">
 
-    <div class="image-box">
-        <img id="batchImage" src="" alt="Portrait">
-    </div>
+<div class="image-box">
+<img id="batchImage" src="" alt="Portrait">
+</div>
 
-    <div class="batch-name" id="batchName"></div>
+<div class="batch-name" id="batchName"></div>
 
-    <button class="memories-btn" onclick="openMemories()">
-        Explore Memories
-    </button>
+<button class="memories-btn" onclick="openMemories()">
+Explore Memories
+</button>
+
 </div>
 
 <footer>
-    <div class="social-links">
-      <h4> <a href="#">Instagram</a> 
-       <a href="#">Whatsapp</a> 
-       <a href="#">Website</a> </h4>
-    </div>
+<div class="social-links">
+<h4>
+<a href="#">Instagram</a>
+<a href="#">Whatsapp</a>
+<a href="#">Website</a>
+</h4>
+</div>
 </footer>
 
 <script>
-let driveLink = "";
 
-const params = new URLSearchParams(window.location.search);
-const batchCode = params.get("code");
+let driveLink="";
+let batchPassword="";
+
+const params=new URLSearchParams(window.location.search);
+const batchCode=params.get("code");
 
 if(batchCode){
-    fetch("batches.json")
-    .then(response => response.json())
-    .then(data => {
-        if(data[batchCode]){
-            document.getElementById("batchImage").src = data[batchCode].image;
-            document.getElementById("batchName").innerText = data[batchCode].name;
-            driveLink = data[batchCode].drive;
-        } else {
-            document.getElementById("batchName").innerText = "Invalid Code";
-        }
-    });
-} else {
-    document.getElementById("batchName").innerText = "Batch Code Missing";
+
+fetch("batches.json")
+
+.then(response=>response.json())
+
+.then(data=>{
+
+if(data[batchCode]){
+
+document.getElementById("batchImage").src=data[batchCode].image;
+document.getElementById("batchName").innerText=data[batchCode].name;
+
+driveLink=data[batchCode].drive;
+batchPassword=data[batchCode].password;
+
+}
+else{
+
+document.getElementById("batchName").innerText="Invalid Code";
+
 }
 
-function openMemories(){
-    if(driveLink){
-        window.open(driveLink, "_blank");
-    }
+});
+
 }
+else{
+
+document.getElementById("batchName").innerText="Batch Code Missing";
+
+}
+
+/* PASSWORD CHECK */
+
+function unlock(){
+
+const entered=document.getElementById("batchPassword").value;
+
+if(entered===batchPassword){
+
+document.getElementById("passwordGate").style.display="none";
+
+}
+else{
+
+alert("Incorrect Password");
+
+}
+
+}
+
+/* OPEN DRIVE */
+
+function openMemories(){
+
+if(driveLink){
+
+window.open(driveLink,"_blank");
+
+}
+
+}
+
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
