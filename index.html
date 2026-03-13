@@ -286,17 +286,21 @@ color:var(--text-primary);
             width: 100%;
         }
 
-        .image-box {
-            width: 95%;
-            max-width: 800px;
-            overflow: hidden;
-            border-radius: 28px;
-            box-shadow: var(--shadow-soft);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            margin-bottom: 2rem;
-        }
+        .image-box{
+width:95%;
+max-width:600px;
+margin:0 auto 2rem auto;
+overflow:hidden;
+border-radius:28px;
+box-shadow:var(--shadow-soft);
+}
+
+.image-box img{
+width:100%;
+height:auto;
+display:block;
+object-fit:contain;
+}
 
         .image-box:hover {
             transform: translateY(-10px) scale(1.02);
