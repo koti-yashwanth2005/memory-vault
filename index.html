@@ -338,25 +338,25 @@
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
-    <div id="passwordGate">
-        <div class="password-box">
-            <h2>🔐 Batch Login</h2>
-            <div class="input-group">
-                <input type="text" id="batchCode" placeholder="Enter Batch Code (User ID)" maxlength="20">
-            </div>
-            <div class="input-group">
-                <input type="password" id="batchPassword" placeholder="Enter Password">
-                <span class="eye-icon" onclick="togglePassword()" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: var(--text-primary);">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 5C6.5 5 2 9.5 2 12C2 14.5 6.5 19 12 19C17.5 19 22 14.5 22 12C22 9.5 17.5 5 12 5Z" stroke="currentColor" stroke-width="2"/>
-                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </span>
-            </div>
-            <button class="unlock-btn" onclick="login()">Login</button>
+    <!-- Fixed Login Screen -->
+<div id="passwordGate">
+    <div class="password-box">
+        <h2>🔐 Batch Login</h2>
+        <div class="input-group">
+            <input type="text" id="batchCode" placeholder="Enter Batch Code (User ID)" maxlength="20">
         </div>
+        <div style="position: relative; margin-bottom: 1.5rem;">
+            <input type="password" id="batchPassword" placeholder="Enter Password" style="padding-right: 50px;">
+            <span class="eye-icon" onclick="togglePassword()" style="right: 15px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 5C6.5 5 2 9.5 2 12C2 14.5 6.5 19 12 19C17.5 19 22 14.5 22 12C22 9.5 17.5 5 12 5Z" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                </svg>
+            </span>
+        </div>
+        <button class="unlock-btn" onclick="login()">Login</button>
     </div>
+</div>
 
     <!-- Header with YOUR LOGO -->
     <header style="display: none;" id="header">
@@ -387,95 +387,74 @@
     </footer>
 
     <script>
-        let currentBatch = null;
-        let batchesData = {};
+let currentBatch = null;
+let batchesData = {};
 
-        // Load batches data FIRST
-        window.addEventListener('load', function() {
-            fetch('batches.json')
-                .then(response => response.json())
-                .then(data => {
-                    batchesData = data;
-                    console.log('✅ Batches loaded:', Object.keys(batchesData));
-                    document.getElementById('batchName').textContent = 'Enter your Batch Code to begin';
-                })
-                .catch(error => {
-                    console.error('❌ batches.json not found');
-                    document.getElementById('batchName').textContent = '⚠️ System Error - Contact Admin';
-                });
-        });
+// Load batches.json on page load
+window.addEventListener('load', function() {
+    fetch('batches.json')
+        .then(response => response.json())
+        .then(data => {
+            batchesData = data;
+            console.log('✅ Batches loaded:', Object.keys(batchesData));
+        })
+        .catch(() => console.error('❌ batches.json missing'));
+});
 
-        function login() {
-            const batchCode = document.getElementById('batchCode').value.trim();
-            const password = document.getElementById('batchPassword').value.trim();
-            const btn = document.querySelector('.unlock-btn');
+function login() {
+    const batchCode = document.getElementById('batchCode').value.trim();
+    const password = document.getElementById('batchPassword').value.trim();
+    const btn = document.querySelector('.unlock-btn');
 
-            // Check data loaded
-            if (Object.keys(batchesData).length === 0) {
-                alert('⏳ Loading batch data... Please wait');
-                return;
-            }
+    if (Object.keys(batchesData).length === 0) {
+        alert('⏳ Loading... Please wait');
+        return;
+    }
 
-            if (!batchCode || !password) {
-                alert('Please enter Batch Code and Password');
-                shakeInput('batchPassword');
-                return;
-            }
+    if (!batchCode) {
+        alert('❌ Enter Batch Code first');
+        return;
+    }
 
-            if (!batchesData[batchCode]) {
-                alert('❌ Invalid Batch Code');
-                shakeInput('batchCode');
-                return;
-            }
+    if (!batchesData[batchCode]) {
+        alert('❌ Invalid Batch Code');
+        return;
+    }
 
-            if (batchesData[batchCode].password !== password) {
-                alert('❌ Wrong Password');
-                shakeInput('batchPassword');
-                return;
-            }
+    if (batchesData[batchCode].password !== password) {
+        alert('❌ Wrong Password');
+        return;
+    }
 
-            // SUCCESS!
-            currentBatch = batchesData[batchCode];
-            btn.innerHTML = '<div class="loading"></div>Unlocking...';
-            
-            setTimeout(() => {
-                document.getElementById('passwordGate').style.display = 'none';
-                document.getElementById('header').style.display = 'flex';
-                document.getElementById('mainContent').style.display = 'flex';
-                document.getElementById('batchImage').src = currentBatch.image;
-                document.getElementById('batchName').textContent = currentBatch.name;
-                document.getElementById('memoriesBtn').disabled = false;
-            }, 800);
-        }
+    // SUCCESS
+    currentBatch = batchesData[batchCode];
+    btn.innerHTML = '<div class="loading"></div>Unlocking...';
+    
+    setTimeout(() => {
+        document.getElementById('passwordGate').style.display = 'none';
+        document.getElementById('batchImage').src = currentBatch.image;
+        document.getElementById('batchName').textContent = currentBatch.name;
+        document.getElementById('memoriesBtn').disabled = false;
+    }, 800);
+}
 
-        function openMemories() {
-            if (currentBatch && currentBatch.drive) {
-                const btn = document.getElementById('memoriesBtn');
-                btn.innerHTML = '<div class="loading"></div>Loading...';
-                setTimeout(() => {
-                    window.open(currentBatch.drive, '_blank');
-                    btn.innerHTML = 'Explore Memories';
-                }, 500);
-            }
-        }
+function openMemories() {
+    if (currentBatch?.drive) {
+        window.open(currentBatch.drive, '_blank');
+    }
+}
 
-        function togglePassword() {
-            const input = document.getElementById('batchPassword');
-            input.type = input.type === 'password' ? 'text' : 'password';
-        }
+function togglePassword() {
+    const input = document.getElementById('batchPassword');
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
 
-        function shakeInput(id) {
-            const input = document.getElementById(id);
-            input.classList.add('error-shake');
-            setTimeout(() => input.classList.remove('error-shake'), 500);
-        }
-
-        // Enter key login
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && document.getElementById('passwordGate').style.display !== 'none') {
-                login();
-            }
-        });
-    </script>
+// Enter key support
+document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && document.getElementById('passwordGate').style.display !== 'none') {
+        login();
+    }
+});
+</script>
 </body>
 </html>
