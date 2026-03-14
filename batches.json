@@ -9,7 +9,7 @@
     "password": "12345678",
 "recovery" : "11223344",
 "cloud": "",
-"cloud ready": true
+"cloudReady": true
   },
   "2026A00002": {
     "name": "CSE Batch 2026",
