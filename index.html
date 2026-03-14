@@ -705,28 +705,39 @@ input.type="password";
 // Open memories
 function openMemories(){
 
-if(driveLink){
+const code = sessionStorage.getItem("batchCode");
 
-const btn=document.getElementById("memoriesBtn");
-
-btn.innerHTML='<div class="loading"></div>Loading...';
-
-setTimeout(()=>{
-window.open(driveLink,"_blank");
-},500);
-
+if(!code){
+alert("Please login first");
+return;
 }
 
+fetch("batches.json")
+.then(res => res.json())
+.then(data => {
+
+if(!data[code]){
+alert("Batch not found");
+return;
 }
 
-// Enter key support
-document.addEventListener('keydown',function(e){
+const batch = data[code];
 
-if(e.key==="Enter" && document.getElementById("passwordGate").style.display!=="none"){
-unlock();
+/* CLOUD PRIORITY */
+
+if(batch.cloudReady){
+
+window.location.href = "gallery.html";
+
+}else{
+
+window.open(batch.drive, "_blank");
+
 }
 
 });
+
+}
     </script>
 </body>
 </html>
