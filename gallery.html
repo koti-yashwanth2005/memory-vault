@@ -277,34 +277,26 @@ batchData=data[batchCode];
 
 document.getElementById("batchTitle").innerText=batchData.name;
 
-loadImages();
+/* generate image list */
+
+const cloud=batchData.cloud;
+const folder=batchData.folder;
+const count=batchData.count;
+
+for(let i=1;i<=count;i++){
+
+let src=`https://res.cloudinary.com/${cloud}/image/upload/${folder}/${i}`;
+
+images.push(src);
+
+}
+
+/* start loading */
+
+loadMoreImages();
 loadVideos();
 
 });
-
-
-/* LOAD IMAGES */
-
-function loadImage(){
-
-let src = `https://res.cloudinary.com/${cloud}/image/upload/${folder}/${i}`;
-
-document.getElementById("viewerImg").src = src;
-
-let downloadURL =
-`https://res.cloudinary.com/${cloud}/image/upload/fl_attachment/${folder}/${i}`;
-
-const downloadBtn = document.getElementById("downloadBtn");
-
-downloadBtn.href = downloadURL;
-
-downloadBtn.setAttribute("download", `memory_${currentIndex}.jpg`);
-
-}
-
-loadMoreImages();
-
-}
 
 
 /* LOAD IMAGES STEP */
@@ -369,7 +361,11 @@ let src=images[currentIndex];
 
 document.getElementById("viewerImg").src=src;
 
-document.getElementById("downloadBtn").href=src;
+/* direct download */
+
+let downloadURL=src.replace("/upload/","/upload/fl_attachment/");
+
+document.getElementById("downloadBtn").href=downloadURL;
 
 }
 
