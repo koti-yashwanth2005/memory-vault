@@ -18,7 +18,8 @@ display:flex;
 flex-direction:column;
 }
 
-/* Logo watermark center */
+/* LOGO WATERMARK */
+
 body::before{
 content:"";
 position:fixed;
@@ -27,12 +28,10 @@ left:50%;
 transform:translate(-50%,-50%);
 width:260px;
 height:260px;
-
 background-image:url("images/logo.png");
 background-size:contain;
 background-repeat:no-repeat;
 background-position:center;
-
 opacity:0.08;
 pointer-events:none;
 z-index:-1;
@@ -59,13 +58,29 @@ font-weight:600;
 text-align:center;
 flex:1;
 }
-/* GALLERY GRID */
+
+/* MAIN LAYOUT */
+
+.main{
+display:grid;
+grid-template-columns:1fr 1fr;
+height:calc(100vh - 60px);
+}
+
+/* SCROLL AREAS */
+
+.images-container,
+.videos-container{
+overflow-y:auto;
+padding:15px;
+}
+
+/* IMAGE GRID */
 
 .gallery{
 display:grid;
 grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
 gap:10px;
-padding:15px;
 }
 
 .gallery img{
@@ -79,6 +94,21 @@ transition:.3s;
 
 .gallery img:hover{
 transform:scale(1.05);
+}
+
+/* VIDEO GRID */
+
+.videos{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:15px;
+}
+
+.videos iframe{
+width:100%;
+aspect-ratio:16/9;
+border:none;
+border-radius:6px;
 }
 
 /* FULLSCREEN VIEWER */
@@ -102,7 +132,7 @@ max-width:90%;
 max-height:80%;
 }
 
-/* CLOSE BUTTON */
+/* CLOSE */
 
 .close-btn{
 position:fixed;
@@ -112,17 +142,35 @@ width:45px;
 height:45px;
 border-radius:50%;
 background:rgba(0,0,0,0.6);
-color:#ffffff;
+color:#fff;
 font-size:28px;
 border:none;
 cursor:pointer;
 display:flex;
 align-items:center;
 justify-content:center;
-z-index:1000;
 }
 
-/* DOWNLOAD BUTTON */
+/* NAVIGATION */
+
+.nav{
+position:absolute;
+top:50%;
+transform:translateY(-50%);
+background:rgba(0,0,0,0.6);
+color:white;
+border:none;
+width:50px;
+height:50px;
+border-radius:50%;
+font-size:25px;
+cursor:pointer;
+}
+
+.nav.left{ left:20px; }
+.nav.right{ right:20px; }
+
+/* DOWNLOAD */
 
 .download{
 position:absolute;
@@ -133,6 +181,20 @@ padding:12px 35px;
 border-radius:30px;
 font-weight:bold;
 text-decoration:none;
+}
+
+/* MOBILE */
+
+@media(max-width:700px){
+
+.main{
+grid-template-columns:1fr;
+}
+
+.videos{
+grid-template-columns:1fr;
+}
+
 }
 
 </style>
@@ -151,23 +213,48 @@ Loading...
 
 </header>
 
+
+<div class="main">
+
+<div class="images-container">
+
 <div class="gallery" id="gallery"></div>
-
-<div class="viewer" id="viewer">
-
-<div class="close-btn" onclick="closeViewer()">X</div>
-
-<img id="viewerImg">
-
-<a id="downloadBtn" class="download" download>
-Download
-</a>
 
 </div>
 
+<div class="videos-container">
+
+<div class="videos">
+
+<iframe src="https://www.youtube.com/embed/VIDEOID1"></iframe>
+<iframe src="https://www.youtube.com/embed/VIDEOID2"></iframe>
+<iframe src="https://www.youtube.com/embed/VIDEOID3"></iframe>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="viewer" id="viewer">
+
+<button class="close-btn" onclick="closeViewer()">X</button>
+
+<button class="nav left" onclick="prevImage()">⬅</button>
+
+<img id="viewerImg">
+
+<button class="nav right" onclick="nextImage()">➡</button>
+
+<a id="downloadBtn" class="download" download>Download</a>
+
+</div>
+
+
 <script>
 
-/* SECURITY CHECK */
+/* ACCESS CHECK */
 
 const batchCode = sessionStorage.getItem("batchCode");
 
@@ -180,42 +267,13 @@ throw new Error("No session batch code");
 
 }
 
-/* LOAD BATCH DATA */
+/* IMAGE SYSTEM */
 
-let batchData;
-
-fetch("batches.json")
-.then(res=>res.json())
-.then(data=>{
-
-if(!data[batchCode]){
-
-document.getElementById("batchTitle").innerText="Batch Name Not Found";
-return;
-
-}
-
-batchData=data[batchCode];
-
-document.getElementById("batchTitle").innerText=batchData.name;
-
-loadGallery();
-
-})
-.catch(()=>{
-document.getElementById("batchTitle").innerText="Error Loading Batch";
-});
-
-/* LAZY LOADING SYSTEM */
-
+const cloud = "https://yourcloud/batch/";
 let loadedImages = 0;
-const loadStep = 30;
+let currentIndex = 1;
 
-function loadGallery(){
-
-loadMoreImages();
-
-}
+const loadStep = 36;
 
 function loadMoreImages(){
 
@@ -225,18 +283,16 @@ for(let i=0;i<loadStep;i++){
 
 loadedImages++;
 
-if(loadedImages > batchData.count) return;
-
 let num=String(loadedImages).padStart(3,"0");
 
 let img=document.createElement("img");
 
 img.loading="lazy";
 
-img.src=batchData.cloud + batchData.folder + "/" + num + ".jpg";
+img.src=cloud + num + ".jpg";
 
 img.onclick=function(){
-openViewer(img.src);
+openViewer(loadedImages);
 };
 
 gallery.appendChild(img);
@@ -245,23 +301,38 @@ gallery.appendChild(img);
 
 }
 
-/* SCROLL DETECTION */
-
-window.addEventListener("scroll",function(){
-
-if(window.innerHeight + window.scrollY >= document.body.offsetHeight - 200){
-
 loadMoreImages();
 
+/* SCROLL LOAD */
+
+document.querySelector(".images-container")
+.addEventListener("scroll",function(){
+
+let box=this;
+
+if(box.scrollTop + box.clientHeight >= box.scrollHeight - 200){
+loadMoreImages();
 }
 
 });
 
-/* IMAGE VIEWER */
+/* VIEWER */
 
-function openViewer(src){
+function openViewer(index){
+
+currentIndex=index;
 
 document.getElementById("viewer").style.display="flex";
+
+loadImage();
+
+}
+
+function loadImage(){
+
+let num=String(currentIndex).padStart(3,"0");
+
+let src=cloud + num + ".jpg";
 
 document.getElementById("viewerImg").src=src;
 
@@ -269,13 +340,49 @@ document.getElementById("downloadBtn").href=src;
 
 }
 
-/* CLOSE VIEWER */
-
 function closeViewer(){
 
 document.getElementById("viewer").style.display="none";
 
 }
+
+/* NAVIGATION */
+
+function nextImage(){
+currentIndex++;
+loadImage();
+}
+
+function prevImage(){
+if(currentIndex>1){
+currentIndex--;
+loadImage();
+}
+}
+
+/* SWIPE */
+
+let startX=0;
+
+document.getElementById("viewer")
+.addEventListener("touchstart",e=>{
+startX=e.changedTouches[0].screenX;
+});
+
+document.getElementById("viewer")
+.addEventListener("touchend",e=>{
+
+let endX=e.changedTouches[0].screenX;
+
+if(endX < startX - 50){
+nextImage();
+}
+
+if(endX > startX + 50){
+prevImage();
+}
+
+});
 
 </script>
 
