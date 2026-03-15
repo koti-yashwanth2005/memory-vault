@@ -5,12 +5,13 @@
   "2026A00001": {
     "name": "IT Batch 2026",
     "image": "images/2026A00001.jpg",
-    "drive": "https://drive.google.com/drive/folders/1eoPqfjztWn35b6xYtNIHxp2UE3OfoW1P",
+    "drive": "https://drive.google.com/drive/folders/1eoPqfjztWn35b6xYtNIHxp2UE3Ofo",
     "password": "12345678",
 "recovery" : "11223344",
-"cloud": "https://res.cloudinary.com/dradluvjq/image/upload/2026A00001",
+"cloud": "dradluvjq",
     "folder":"2026A00001",
-"cloudReady": true
+"cloudReady": true,
+    "videos": ["a","b","c","d","e","f"]
   },
   "2026A00002": {
     "name": "CSE Batch 2026",
