@@ -12,14 +12,13 @@
 body{
 background:#ffffff;
 margin:0;
-min-height:100vh;
 font-family:'Inter',sans-serif;
 display:flex;
 flex-direction:column;
 padding-bottom:60px;
 }
 
-/* WATERMARK */
+/* LOGO WATERMARK */
 
 body::before{
 content:"";
@@ -43,9 +42,8 @@ z-index:-1;
 header{
 display:flex;
 align-items:center;
-justify-content:space-between;
 background:#000;
-padding:12px 16px;
+padding:12px;
 }
 
 .logo{
@@ -56,8 +54,8 @@ height:35px;
 color:white;
 font-size:20px;
 font-weight:600;
-text-align:center;
 flex:1;
+text-align:center;
 }
 
 /* IMAGE GRID */
@@ -75,11 +73,6 @@ height:150px;
 object-fit:cover;
 border-radius:6px;
 cursor:pointer;
-transition:.3s;
-}
-
-.gallery img:hover{
-transform:scale(1.05);
 }
 
 /* VIDEO GRID */
@@ -114,7 +107,7 @@ top:0;
 left:0;
 width:100%;
 height:100%;
-background:rgba(0,0,0,0.95);
+background:black;
 display:none;
 align-items:center;
 justify-content:center;
@@ -127,32 +120,26 @@ max-width:90%;
 max-height:80%;
 }
 
-/* CLOSE BUTTON */
+/* CLOSE */
 
 .close-btn{
 position:fixed;
 top:20px;
 right:20px;
-width:45px;
-height:45px;
-border-radius:50%;
-background:rgba(0,0,0,0.6);
-color:#fff;
-font-size:28px;
+background:black;
+color:white;
 border:none;
+font-size:28px;
 cursor:pointer;
-display:flex;
-align-items:center;
-justify-content:center;
 }
 
-/* NAV BUTTONS */
+/* NAV */
 
 .nav{
 position:absolute;
 top:50%;
 transform:translateY(-50%);
-background:rgba(0,0,0,0.6);
+background:black;
 color:white;
 border:none;
 width:50px;
@@ -162,8 +149,8 @@ font-size:25px;
 cursor:pointer;
 }
 
-.nav.left{ left:20px; }
-.nav.right{ right:20px; }
+.nav.left{ left:20px;}
+.nav.right{ right:20px;}
 
 /* DOWNLOAD */
 
@@ -172,10 +159,10 @@ position:absolute;
 bottom:30px;
 background:white;
 color:black;
-padding:12px 35px;
-border-radius:30px;
-font-weight:bold;
+padding:10px 30px;
+border-radius:25px;
 text-decoration:none;
+font-weight:bold;
 }
 
 /* FOOTER */
@@ -187,8 +174,8 @@ left:0;
 width:100%;
 display:flex;
 justify-content:space-around;
-background:#000;
-padding:10px 0;
+background:black;
+padding:10px;
 }
 
 .footerTabs button{
@@ -196,7 +183,6 @@ background:none;
 border:none;
 color:white;
 font-size:16px;
-font-weight:600;
 cursor:pointer;
 }
 
@@ -216,17 +202,20 @@ Loading...
 
 </header>
 
+
 <!-- IMAGES -->
 
 <div id="imagesSection">
 <div class="gallery" id="gallery"></div>
 </div>
 
+
 <!-- VIDEOS -->
 
 <div id="videosSection" style="display:none">
 <div class="videos" id="videoContainer"></div>
 </div>
+
 
 <!-- IMAGE VIEWER -->
 
@@ -244,14 +233,17 @@ Loading...
 
 </div>
 
+
 <!-- FOOTER -->
 
 <div class="footerTabs">
 
 <button onclick="showImages()">Images</button>
+
 <button onclick="showVideos()">Videos</button>
 
 </div>
+
 
 <script>
 
@@ -261,8 +253,7 @@ const batchCode = sessionStorage.getItem("batchCode");
 
 if(!batchCode){
 
-document.body.innerHTML =
-"<h2 style='text-align:center;margin-top:100px;'>Access Denied</h2>";
+document.body.innerHTML="<h2 style='text-align:center;margin-top:100px;'>Access Denied</h2>";
 
 throw new Error("No session");
 
@@ -276,18 +267,12 @@ let currentIndex=0;
 
 const loadStep=36;
 
-/* LOAD BATCH DATA */
+
+/* LOAD BATCH */
 
 fetch("batches.json")
 .then(res=>res.json())
 .then(data=>{
-
-if(!data[batchCode]){
-
-document.getElementById("batchTitle").innerText="Batch Not Found";
-return;
-
-}
 
 batchData=data[batchCode];
 
@@ -298,30 +283,29 @@ loadVideos();
 
 });
 
-/* LOAD CLOUDINARY IMAGES */
 
-async function loadImages(){
+/* LOAD IMAGES */
+
+function loadImages(){
 
 const cloud=batchData.cloud;
 const folder=batchData.folder;
+const count=batchData.count;
 
-const url=`https://res.cloudinary.com/${cloud}/image/list/${folder}.json`;
+for(let i=1;i<=count;i++){
 
-const data=await fetch(url).then(r=>r.json());
-
-data.resources.forEach(img=>{
-
-let src=`https://res.cloudinary.com/${cloud}/image/upload/${img.public_id}.jpg`;
+let src=`https://res.cloudinary.com/${cloud}/image/upload/${folder}/${i}.jpg`;
 
 images.push(src);
 
-});
+}
 
 loadMoreImages();
 
 }
 
-/* LOAD IMAGES IN STEPS */
+
+/* LOAD IMAGES STEP */
 
 function loadMoreImages(){
 
@@ -334,7 +318,6 @@ if(loadedImages>=images.length) return;
 let img=document.createElement("img");
 
 img.src=images[loadedImages];
-img.loading="lazy";
 
 let index=loadedImages;
 
@@ -352,6 +335,7 @@ loadedImages++;
 
 }
 
+
 /* SCROLL LOAD */
 
 window.addEventListener("scroll",function(){
@@ -363,6 +347,7 @@ loadMoreImages();
 }
 
 });
+
 
 /* VIEWER */
 
@@ -392,13 +377,12 @@ document.getElementById("viewer").style.display="none";
 
 }
 
-/* IMAGE NAVIGATION */
-
 function nextImage(){
 
 if(currentIndex < images.length-1){
 
 currentIndex++;
+
 updateViewer();
 
 }
@@ -410,13 +394,15 @@ function prevImage(){
 if(currentIndex>0){
 
 currentIndex--;
+
 updateViewer();
 
 }
 
 }
 
-/* LOAD VIDEOS */
+
+/* VIDEOS */
 
 function loadVideos(){
 
@@ -428,13 +414,12 @@ let iframe=document.createElement("iframe");
 
 iframe.src="https://www.youtube.com/embed/"+id;
 
-iframe.allowFullscreen=true;
-
 container.appendChild(iframe);
 
 });
 
 }
+
 
 /* SWITCH SECTIONS */
 
@@ -451,42 +436,6 @@ document.getElementById("imagesSection").style.display="none";
 document.getElementById("videosSection").style.display="block";
 
 }
-
-/* SWIPE BETWEEN SECTIONS */
-
-let startX=0;
-
-document.addEventListener("touchstart",e=>{
-startX=e.changedTouches[0].screenX;
-});
-
-document.addEventListener("touchend",e=>{
-
-let endX=e.changedTouches[0].screenX;
-
-if(endX < startX - 50) showVideos();
-
-if(endX > startX + 50) showImages();
-
-});
-
-/* SWIPE IMAGE VIEWER */
-
-document.getElementById("viewer")
-.addEventListener("touchstart",e=>{
-startX=e.changedTouches[0].screenX;
-});
-
-document.getElementById("viewer")
-.addEventListener("touchend",e=>{
-
-let endX=e.changedTouches[0].screenX;
-
-if(endX < startX - 50) nextImage();
-
-if(endX > startX + 50) prevImage();
-
-});
 
 </script>
 
