@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Redirecting...</title>
+
+<script>
+
+const path = window.location.pathname.replace("/", "");
+
+if(path){
+window.location.href = "/?code=" + path;
+}else{
+window.location.href = "/";
+}
+
+</script>
+
+</head>
+<body>
+Redirecting...
+</body>
+</html>
